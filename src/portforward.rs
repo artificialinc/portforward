@@ -39,7 +39,6 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
     debug!("{:?}", config);
 
     let client_config = load_config(&config.config_path, &config.kube_context).await?;
-    config.accept_invalid_certs = true;
     let client = Client::try_from(client_config)?;
 
     let target_pod = find_pod(&client, &config.namespace, &config.pod_or_service).await?;
@@ -81,7 +80,7 @@ async fn load_config(
         return Ok(incluster_config);
     }
 
-    let kube_config = kube::config::Kubeconfig::read_from(config_path.clone())?;
+    let kube_config = kube::config::Kubeconfig::read_from(config_path)?;
     let mut options = kube::config::KubeConfigOptions::default();
 
     // "" is the sign for using default context
